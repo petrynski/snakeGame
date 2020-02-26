@@ -1,0 +1,4 @@
+﻿  SnakeGame.cpp
+C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(42,43): warning C4838: konwersja z „int” do „SHORT” wymaga konwersji zawężającej
+C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(42,69): warning C4838: konwersja z „int” do „SHORT” wymaga konwersji zawężającej
+  SnakeGame.vcxproj -> C:\Users\Michał\source\repos\SnakeGame\Debug\SnakeGame.exe
