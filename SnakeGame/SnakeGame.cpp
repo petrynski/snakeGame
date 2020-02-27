@@ -3,10 +3,25 @@
 #include "Cell.h"
 #include "Fruit.h"
 #include "Snake.h"
+#include "Drawer.h"
+#include <ctime>
+
+#define MARGIN  3
+#define WIDTH   50
+#define HEIGHT  20
+ 
+enum direction{
+RIGHT = 0,
+LEFT = 1,
+DOWN = 2,
+UP = 3
+};
 
 Snake* snakePointer;
 Fruit* fruitPointer;
 bool gameOver;
+unsigned int score;
+time_t start;
 
 bool checkCollision()
 {
@@ -16,10 +31,10 @@ bool checkCollision()
 			return true;
 	}
 
-	if ((snakePointer->getHeadX() <= 3) || (snakePointer->getHeadX() >= 55))
+	if ((snakePointer->getHeadX() <= MARGIN) || (snakePointer->getHeadX() >= MARGIN+WIDTH))
 		return true;
 
-	else if ((snakePointer->getHeadY() <= 3) || (snakePointer->getHeadY() >= 24))
+	else if ((snakePointer->getHeadY() <= MARGIN) || (snakePointer->getHeadY() >= MARGIN+HEIGHT))
 		return true;
 
 	else
@@ -28,65 +43,77 @@ bool checkCollision()
 
 void launch()
 {
+	time(&start);
+	score = 0;
 	gameOver = false;
 	snakePointer = new Snake();
-	fruitPointer = new Fruit();
+	fruitPointer = new Fruit(WIDTH, HEIGHT, MARGIN);
 }
+
+//void draw()
+//{
+//	system("CLS");
+//
+//	//	Drawing snake
+//	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+//	COORD position = { snakePointer->getHeadX(), snakePointer->getHeadY() };
+//	SetConsoleCursorPosition(output, position);
+//	std::cout<<'#';
+//
+//	for (int i = 0; i < snakePointer->getTailSize(); i++)
+//	{
+//		position = { (SHORT)snakePointer->getTailX(i), (SHORT)snakePointer->getTailY(i) };
+//		SetConsoleCursorPosition(output, position);
+//		std::cout << '0';
+//	}
+//
+//	//	Drawing game arena
+//	SetConsoleCursorPosition(output, { 3,3 });
+//	for (int i = 0; i < 52; i++)
+//	{
+//		std::cout << '-';
+//	}
+//
+//	for (SHORT i = 4; i < 24; i++)
+//	{
+//		SetConsoleCursorPosition(output, { 3 , i });
+//		std::cout << '|';
+//		SetConsoleCursorPosition(output, { 54 , i });
+//		std::cout << '|';
+//	}
+//
+//	SetConsoleCursorPosition(output, { 3,24 });
+//	for (SHORT i = 0; i < 52; i++)
+//	{
+//		std::cout << '-';
+//	}
+//
+//	//	Drawing fruit
+//	position = { (SHORT)fruitPointer->getPositionX(), (SHORT)fruitPointer->getPositionY() };
+//	SetConsoleCursorPosition(output, position);
+//	std::cout << '%';
+//}
 
 void draw()
 {
-	system("CLS");
-
-	//	Drawing snake
-	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD position = { snakePointer->getHeadX(), snakePointer->getHeadY() };
-	SetConsoleCursorPosition(output, position);
-	std::cout<<'#';
-
+	Drawer::drawArena(WIDTH, HEIGHT, MARGIN);
+	Drawer::drawFruit(fruitPointer->getPositionX(), fruitPointer->getPositionY());
+	Drawer::drawSnakeHead(snakePointer->getHeadX(), snakePointer->getHeadY());
 	for (int i = 0; i < snakePointer->getTailSize(); i++)
-	{
-		position = { (SHORT)snakePointer->getTailX(i), (SHORT)snakePointer->getTailY(i) };
-		SetConsoleCursorPosition(output, position);
-		std::cout << '0';
-	}
-
-	//	Drawing game arena
-	SetConsoleCursorPosition(output, { 3,3 });
-	for (int i = 0; i < 52; i++)
-	{
-		std::cout << '-';
-	}
-
-	for (SHORT i = 4; i < 24; i++)
-	{
-		SetConsoleCursorPosition(output, { 3 , i });
-		std::cout << '|';
-		SetConsoleCursorPosition(output, { 54 , i });
-		std::cout << '|';
-	}
-
-	SetConsoleCursorPosition(output, { 3,24 });
-	for (SHORT i = 0; i < 52; i++)
-	{
-		std::cout << '-';
-	}
-
-	//	Drawing fruit
-	position = { (SHORT)fruitPointer->getPositionX(), (SHORT)fruitPointer->getPositionY() };
-	SetConsoleCursorPosition(output, position);
-	std::cout << '%';
+		Drawer::drawSnakeTail(snakePointer->getTailX(i), snakePointer->getTailY(i));
+	Drawer::drawSideMenu(score, (int)difftime(time(nullptr),start), WIDTH, MARGIN);
 }
 
 void checkInput()
 {
 	if (GetKeyState(VK_RIGHT) & 0x8000)
-		snakePointer->setDirection(0);
+		snakePointer->setDirection(direction(RIGHT));
 	if (GetKeyState(VK_LEFT) & 0x8000)
-		snakePointer->setDirection(1);
+		snakePointer->setDirection(direction(LEFT));
 	if (GetKeyState(VK_DOWN) & 0x8000)
-		snakePointer->setDirection(2);
+		snakePointer->setDirection(direction(DOWN));
 	if (GetKeyState(VK_UP) & 0x8000)
-		snakePointer->setDirection(3);
+		snakePointer->setDirection(direction(UP));
 }
 
 void updateGame()
@@ -95,14 +122,16 @@ void updateGame()
 	{
 		fruitPointer->setNewPosition();
 		snakePointer->addToTail();
+		score++;
 	}
 	
 	if (checkCollision())
 	{
 		gameOver = true;
 	}
+
 	snakePointer->updateCells();
-	Sleep(15);	//	Most likely will be needed, but creates lags
+	Sleep(30);	//	Most likely will be needed, but creates lags
 }
 
 int outro()
@@ -114,7 +143,7 @@ int outro()
 		system("CLS");
 		std::cout << "Do you want to try again? (T/F)" << std::endl;
 		std::cin >> anwser;
-		std::cin.ignore(INT_MAX,'\n');
+		std::cin.ignore(INT_MAX,'\n');	// Flushing std In
 		switch (anwser)
 		{
 		case 't':

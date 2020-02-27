@@ -1,20 +1,23 @@
 #pragma once
 #include"Snake.h"
+
 class Fruit
 {
 private:
+	int margin, width, height;
 	int cordX, cordY;
 public:
-	Fruit()
+	Fruit(int width, int height, int margin)
 	{
-		cordX = (rand()%51)+3;
-		cordY = (rand()%21)+3;
+		this->setArea(width, height, margin);
+		cordX = (rand() % (width - 1)) + margin + 1;
+		cordY = (rand() % (height - 1)) + margin + 1;
 	}
 
 	void setNewPosition()
 	{
-		cordX = (rand() % 50) + 4;
-		cordY = (rand() % 20) + 4;
+		cordX = (rand() % (width - 1)) + margin + 1;
+		cordY = (rand() % (height - 1)) + margin + 1;
 	}
 
 	int getPositionX()
@@ -26,5 +29,11 @@ public:
 	{
 		return cordY;
 	}
-};
 
+	void setArea(int width, int height, int margin)
+	{
+		this->width = width;
+		this->height = height;
+		this->margin = margin;
+	}
+};

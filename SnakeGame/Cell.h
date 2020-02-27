@@ -3,8 +3,8 @@ class Cell
 {
 private:
 	int cords[2];
-public:
 
+public:
 	Cell(int x, int y);
 	int getCordX();
 	int getCordY();
