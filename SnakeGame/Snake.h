@@ -10,7 +10,7 @@ private:
 	int direction;				// 0 right, 1 left, 2 down, 3 up
 
 public:
-	Snake();
+	Snake(int margin);
 	int getDirection();
 	int getHeadX();
 	int getHeadY();

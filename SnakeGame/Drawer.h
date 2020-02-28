@@ -12,5 +12,6 @@ public:
 	static void drawFruit(int fruitX, int fruitY);
 	static void drawSideMenu(int score, int time, int width, int margin);
 	static void drawSnakeDead(int X, int Y);
+	static void clear(int X, int Y);
 };
 

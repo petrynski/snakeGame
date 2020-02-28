@@ -6,6 +6,9 @@
 #include "Drawer.h"
 #include <ctime>
 
+//TODO 
+//	Highscores
+//	Two Players Mode
 #define MARGIN  3
 #define WIDTH   50
 #define HEIGHT  20
@@ -22,6 +25,8 @@ Fruit* fruitPointer;
 bool gameOver;
 unsigned int score;
 time_t start;
+int tailGhostX = -1;
+int tailGhostY = -1;
 
 bool checkCollision()
 {
@@ -46,62 +51,27 @@ void launch()
 	time(&start);
 	score = 0;
 	gameOver = false;
-	snakePointer = new Snake();
+	snakePointer = new Snake(MARGIN);
 	fruitPointer = new Fruit(WIDTH, HEIGHT, MARGIN);
-}
 
-//void draw()
-//{
-//	system("CLS");
-//
-//	//	Drawing snake
-//	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-//	COORD position = { snakePointer->getHeadX(), snakePointer->getHeadY() };
-//	SetConsoleCursorPosition(output, position);
-//	std::cout<<'#';
-//
-//	for (int i = 0; i < snakePointer->getTailSize(); i++)
-//	{
-//		position = { (SHORT)snakePointer->getTailX(i), (SHORT)snakePointer->getTailY(i) };
-//		SetConsoleCursorPosition(output, position);
-//		std::cout << '0';
-//	}
-//
-//	//	Drawing game arena
-//	SetConsoleCursorPosition(output, { 3,3 });
-//	for (int i = 0; i < 52; i++)
-//	{
-//		std::cout << '-';
-//	}
-//
-//	for (SHORT i = 4; i < 24; i++)
-//	{
-//		SetConsoleCursorPosition(output, { 3 , i });
-//		std::cout << '|';
-//		SetConsoleCursorPosition(output, { 54 , i });
-//		std::cout << '|';
-//	}
-//
-//	SetConsoleCursorPosition(output, { 3,24 });
-//	for (SHORT i = 0; i < 52; i++)
-//	{
-//		std::cout << '-';
-//	}
-//
-//	//	Drawing fruit
-//	position = { (SHORT)fruitPointer->getPositionX(), (SHORT)fruitPointer->getPositionY() };
-//	SetConsoleCursorPosition(output, position);
-//	std::cout << '%';
-//}
+	//Draws arena once to optimise game update iteration
+	Drawer::drawArena(WIDTH, HEIGHT, MARGIN);
+}
 
 void draw()
 {
-	Drawer::drawArena(WIDTH, HEIGHT, MARGIN);
+	//Drawer is also used:
+	//	1) To draw arena in launch function
+	//	2) To draw dead snake cells in deadAnimation function
 	Drawer::drawFruit(fruitPointer->getPositionX(), fruitPointer->getPositionY());
 	Drawer::drawSnakeHead(snakePointer->getHeadX(), snakePointer->getHeadY());
 	for (int i = 0; i < snakePointer->getTailSize(); i++)
 		Drawer::drawSnakeTail(snakePointer->getTailX(i), snakePointer->getTailY(i));
 	Drawer::drawSideMenu(score, (int)difftime(time(nullptr),start), WIDTH, MARGIN);
+
+	//Clears image where tail was before
+	if(tailGhostX!=-1&&tailGhostY!=-1)
+		Drawer::clear(tailGhostX,tailGhostY);
 }
 
 void checkInput()
@@ -128,10 +98,32 @@ void updateGame()
 	if (checkCollision())
 	{
 		gameOver = true;
+		return;
 	}
 
+	// Takes coordinates of the cell that will be empty
+	tailGhostX = snakePointer->getTailX(snakePointer->getTailSize() - 1);
+	tailGhostY = snakePointer->getTailY(snakePointer->getTailSize() - 1);
+
 	snakePointer->updateCells();
-	Sleep(30);	//	Most likely will be needed, but creates lags
+	Sleep(100);	//	Makes game go slower
+}
+
+void deadAnimation()
+{
+	Drawer::drawArena(WIDTH, HEIGHT, MARGIN);
+	Drawer::drawSideMenu(score, difftime(time(nullptr), start), WIDTH, MARGIN);
+	for (int j = 0; j < snakePointer->getTailSize(); j++)
+		Drawer::drawSnakeDead(snakePointer->getTailX(j), snakePointer->getTailY(j));
+	Drawer::drawSnakeDead(snakePointer->getHeadX(), snakePointer->getHeadY());
+
+	for (int i = snakePointer->getTailSize() - 1; i >= 0; i--)
+	{
+		Sleep(100);
+		Drawer::clear(snakePointer->getTailX(i), snakePointer->getTailY(i));
+	}
+	
+
 }
 
 int outro()
@@ -141,6 +133,8 @@ int outro()
 	char anwser;
 	while (1) {
 		system("CLS");
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(output, 7);
 		std::cout << "Do you want to try again? (T/F)" << std::endl;
 		std::cin >> anwser;
 		std::cin.ignore(INT_MAX,'\n');	// Flushing std In
@@ -168,6 +162,7 @@ start:
 		checkInput();
 		updateGame();
 	}
+	deadAnimation();
 	if (outro())
 		goto start;
 

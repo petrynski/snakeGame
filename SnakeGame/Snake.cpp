@@ -1,11 +1,11 @@
 #include "Snake.h"
 
-Snake::Snake()
+Snake::Snake(int margin)
 {
-	this->head = new Cell(5, 5);
+	this->head = new Cell(margin + 5, margin + 5);
 	this->direction = 0;
-	this->addToTail(4, 5);
-	this->addToTail(3, 5);
+	this->addToTail(margin + 4, margin + 5);
+	this->addToTail(margin + 3, margin + 5);
 }
 
 int Snake::getDirection()
