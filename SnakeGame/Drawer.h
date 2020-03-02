@@ -13,5 +13,6 @@ public:
 	static void drawSideMenu(int score, int time, int width, int margin);
 	static void drawSnakeDead(int X, int Y);
 	static void clear(int X, int Y);
+	static void drawHighscores(int i, int score, std::string name, int width, int margin);
 };
 

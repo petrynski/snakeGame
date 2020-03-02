@@ -64,7 +64,7 @@ void Drawer::drawSideMenu(int score, int time, int width, int margin)
 	printf("Score: %d, Time %d", score, time);
 
 	SetConsoleCursorPosition(output, { X, Y + 5 });
-	printf("Author: Michal Petrynski");
+	printf("Highscores!");
 
 }
 
@@ -84,4 +84,16 @@ void Drawer::clear(int X, int Y)
 	SetConsoleCursorPosition(output, { (SHORT)X, (SHORT)Y });
 	printf(" ");
 	SetConsoleCursorPosition(output, {0, 0});
+}
+
+// i is an iterator, that is used to repeat this function for different scores
+// See SnakeGame.cpp draw() function definition
+void Drawer::drawHighscores(int i, int score, std::string name, int width, int margin)
+{
+	short X = margin * 2 + width;
+	short Y = margin + 6 + i;
+	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleCursorPosition(output, { X, Y });
+	SetConsoleTextAttribute(output, 10);
+	std::cout << "#" << i+1 << " " << name << ": " << score;
 }

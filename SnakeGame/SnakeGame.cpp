@@ -5,6 +5,7 @@
 #include "Snake.h"
 #include "Drawer.h"
 #include <ctime>
+#include <fstream>
 
 //TODO 
 //	Highscores
@@ -19,6 +20,10 @@ LEFT = 1,
 DOWN = 2,
 UP = 3
 };
+struct highscore {
+	int hscore = 0;
+	std::string name = "None";
+};
 
 Snake* snakePointer;
 Fruit* fruitPointer;
@@ -27,6 +32,8 @@ unsigned int score;
 time_t start;
 int tailGhostX = -1;
 int tailGhostY = -1;
+highscore highscoresTable[10];
+highscore currentScore;
 
 bool checkCollision()
 {
@@ -46,8 +53,69 @@ bool checkCollision()
 		return false;
 }
 
+void highscoresFileSetup()
+{
+	std::ifstream highscores("highscores.txt");
+	std::string line;
+	int i = 0;
+	if(highscores.is_open())
+		while (!highscores.eof())
+		{
+			if (i >= 10)
+				break;
+			highscores >> highscoresTable[i].name;
+			highscores >> highscoresTable[i].hscore;
+			i++;
+		}
+	highscores.close();
+}
+
+void highscoreSave()
+{
+	std::ofstream file("highscores.txt");
+	system("CLS");
+	int i;
+	std::string oldName;
+	int oldScore;
+
+	for (i = 0; i < 10; i++)
+	{
+		if (score > highscoresTable[i].hscore)
+		{
+			oldName = highscoresTable[i].name;
+			oldScore = highscoresTable[i].hscore;
+			std::string newHighscoreName = "";
+			std::cout << "Type your name: ";
+			std::cin >> newHighscoreName;
+			highscoresTable[i].name = newHighscoreName;
+			highscoresTable[i].hscore = score;
+			break;
+		}
+	}
+	i++;
+	for (i+1; i < 10; i++)
+	{
+		int helpInt;;
+		std::string helpString;
+		helpInt = highscoresTable[i].hscore;
+		helpString = highscoresTable[i].name;
+		highscoresTable[i].hscore = oldScore;
+		highscoresTable[i].name = oldName;
+		oldScore = helpInt;
+		oldName = helpString;
+	}
+	
+	for (int i = 0; i < 10; i++)
+	{
+		file << highscoresTable[i].name << " " << highscoresTable[i].hscore << std::endl;
+	}
+
+	file.close();
+}
+
 void launch()
 {
+	highscoresFileSetup();
 	time(&start);
 	score = 0;
 	gameOver = false;
@@ -68,6 +136,8 @@ void draw()
 	for (int i = 0; i < snakePointer->getTailSize(); i++)
 		Drawer::drawSnakeTail(snakePointer->getTailX(i), snakePointer->getTailY(i));
 	Drawer::drawSideMenu(score, (int)difftime(time(nullptr),start), WIDTH, MARGIN);
+	for (int i = 0; i < 10; i++)
+		Drawer::drawHighscores(i, highscoresTable[i].hscore, highscoresTable[i].name, WIDTH, MARGIN);
 
 	//Clears image where tail was before
 	if(tailGhostX!=-1&&tailGhostY!=-1)
@@ -84,6 +154,11 @@ void checkInput()
 		snakePointer->setDirection(direction(DOWN));
 	if (GetKeyState(VK_UP) & 0x8000)
 		snakePointer->setDirection(direction(UP));
+	if (GetKeyState(VK_ESCAPE) & 0x8000)
+	{
+		system("CLS");
+		exit(0);
+	}
 }
 
 void updateGame()
@@ -130,6 +205,8 @@ int outro()
 {
 	delete snakePointer;
 	delete fruitPointer;
+	highscoreSave();
+
 	char anwser;
 	while (1) {
 		system("CLS");

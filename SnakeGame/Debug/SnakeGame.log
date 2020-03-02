@@ -1,3 +1,5 @@
 ﻿  SnakeGame.cpp
-C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(112,38): warning C4244: "argument": konwersja z "double" do "int", możliwa utrata danych
+C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(83,13): warning C4018: ">": niezgodność typu ze znakiem/bez znaku
+C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(96,8): warning C4552: „+”: Wynik wyrażenia nie jest używany
+C:\Users\Michał\source\repos\SnakeGame\SnakeGame\SnakeGame.cpp(190,38): warning C4244: "argument": konwersja z "double" do "int", możliwa utrata danych
   SnakeGame.vcxproj -> C:\Users\Michał\source\repos\SnakeGame\Debug\SnakeGame.exe
