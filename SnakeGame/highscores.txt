@@ -1,10 +1,10 @@
 Michal 16
+Joseph 16
+Andrew 11
 Tom 9
-None 0
-None 0
-None 0
-None 0
-None 0
-None 0
+Martin 6
+a 5
+Adam 4
+0 4
 None 0
 None 0

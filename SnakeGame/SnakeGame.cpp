@@ -53,6 +53,52 @@ bool checkCollision()
 		return false;
 }
 
+void showHighscores()
+{
+	system("CLS");
+
+	for (int i = 0; i < 10; i++)
+		Drawer::drawHighscores(i, highscoresTable[i].hscore, highscoresTable[i].name, 10, 0);
+	printf("\n\n");
+	system("pause");
+}
+
+void menuLaunch()
+{
+	while (1) {
+		int option;
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(output, 7);
+
+		system("CLS");
+		std::cout << "Snake Game!" << std::endl;
+		std::cout << "Select your option:" << std::endl;
+		std::cout << "1) Play 1p" << std::endl;
+		std::cout << "2) Play 2p (not avaiable yet)" << std::endl;
+		std::cout << "3) Show highscores" << std::endl;
+		std::cout << "0) EXIT" << std::endl;
+		std::cout << "Your option: ";
+		std::cin >> option;
+
+		switch (option)
+		{
+		case 0:
+			exit(0);
+			break;
+		case 1:
+			return;
+			break;
+		case 2:
+			break;
+		case 3:
+			showHighscores();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 void highscoresFileSetup()
 {
 	std::ifstream highscores("highscores.txt");
@@ -181,7 +227,7 @@ void updateGame()
 	tailGhostY = snakePointer->getTailY(snakePointer->getTailSize() - 1);
 
 	snakePointer->updateCells();
-	Sleep(100);	//	Makes game go slower
+	Sleep(50);	//	Makes game go slower
 }
 
 void deadAnimation()
@@ -201,37 +247,18 @@ void deadAnimation()
 
 }
 
-int outro()
+void outro()
 {
 	delete snakePointer;
 	delete fruitPointer;
 	highscoreSave();
-
-	char anwser;
-	while (1) {
-		system("CLS");
-		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(output, 7);
-		std::cout << "Do you want to try again? (T/F)" << std::endl;
-		std::cin >> anwser;
-		std::cin.ignore(INT_MAX,'\n');	// Flushing std In
-		switch (anwser)
-		{
-		case 't':
-		case 'T':
-			return 1;
-			break;		// it's useless, but for the sake of all...
-
-		case 'f':
-		case 'F':
-			return 0;
-		}
-	}
+	system("CLS");
 }
 
 int main()
 {
 start:
+	menuLaunch();
 	launch();
 	while (!gameOver)
 	{
@@ -240,8 +267,8 @@ start:
 		updateGame();
 	}
 	deadAnimation();
-	if (outro())
-		goto start;
+	outro();
+	goto start;
 
 	return 0;
 }
